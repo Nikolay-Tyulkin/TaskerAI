@@ -1,0 +1,11 @@
+.env
+.idea/
+backend/.venv/
+backend/*.egg-info/
+frontend/node_modules/
+frontend/dist/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.sqlite3
+*.db
