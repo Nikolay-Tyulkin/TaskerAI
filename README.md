@@ -57,6 +57,8 @@ cd backend
 python -m pytest
 ```
 
+Backend-тесты покрывают API задач и AI mock-flow. Реальный AI API key для запуска тестов не требуется.
+
 Frontend:
 
 ```powershell

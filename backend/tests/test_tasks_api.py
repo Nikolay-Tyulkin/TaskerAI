@@ -1,4 +1,85 @@
+from uuid import uuid4
+
 from fastapi.testclient import TestClient
+
+
+def test_task_crud_api(api: TestClient) -> None:
+    title = f"CRUD task {uuid4().hex}"
+
+    created = api.post(
+        "/api/tasks",
+        json={
+            "title": title,
+            "description": "Initial description",
+            "status": "К выполнению",
+            "priority": "Средний",
+            "deadline": "2026-06-15",
+        },
+    )
+    assert created.status_code == 201
+    task_id = created.json()["id"]
+    assert created.json()["title"] == title
+
+    fetched = api.get(f"/api/tasks/{task_id}")
+    assert fetched.status_code == 200
+    assert fetched.json()["description"] == "Initial description"
+
+    listed = api.get(f"/api/tasks?search={title}")
+    assert listed.status_code == 200
+    assert [item["id"] for item in listed.json()] == [task_id]
+
+    updated = api.patch(
+        f"/api/tasks/{task_id}",
+        json={"title": f"{title} updated", "status": "В работе", "priority": "Высокий"},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["title"] == f"{title} updated"
+    assert updated.json()["status"] == "В работе"
+    assert updated.json()["priority"] == "Высокий"
+
+    deleted = api.delete(f"/api/tasks/{task_id}")
+    assert deleted.status_code == 204
+
+    missing_after_delete = api.get(f"/api/tasks/{task_id}")
+    assert missing_after_delete.status_code == 404
+    assert missing_after_delete.json()["code"] == "task_not_found"
+
+
+def test_filters_tasks_by_status_priority_and_search(api: TestClient) -> None:
+    suffix = uuid4().hex
+    matching_title = f"Filter target {suffix}"
+    other_title = f"Filter other {suffix}"
+
+    matching = api.post(
+        "/api/tasks",
+        json={"title": matching_title, "description": "Find this unique needle", "status": "В работе", "priority": "Высокий"},
+    )
+    assert matching.status_code == 201
+    matching_id = matching.json()["id"]
+    other = api.post(
+        "/api/tasks",
+        json={"title": other_title, "description": "Same suffix", "status": "К выполнению", "priority": "Низкий"},
+    )
+    assert other.status_code == 201
+
+    filtered = api.get(f"/api/tasks?status=В работе&priority=Высокий&search={suffix}")
+
+    assert filtered.status_code == 200
+    assert [item["id"] for item in filtered.json()] == [matching_id]
+
+
+def test_unknown_task_returns_404(api: TestClient) -> None:
+    response = api.get("/api/tasks/999999999")
+
+    assert response.status_code == 404
+    assert response.json()["code"] == "task_not_found"
+
+
+def test_rejects_empty_task_title(api: TestClient) -> None:
+    response = api.post("/api/tasks", json={"title": "   "})
+
+    assert response.status_code == 422
+    assert response.json()["code"] == "validation_error"
 
 
 def test_task_crud_and_subtasks(api: TestClient) -> None:

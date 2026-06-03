@@ -3,13 +3,41 @@ from fastapi.testclient import TestClient
 
 def test_ai_mock_and_history(api: TestClient, monkeypatch) -> None:
     monkeypatch.setenv("AI_MOCK_MODE", "true")
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+
+    settings = api.get("/api/ai/settings")
+    assert settings.status_code == 200
+    assert settings.json()["mock"] is True
+    assert settings.json()["is_configured"] is True
+
+    models = api.get("/api/ai/models")
+    assert models.status_code == 200
+    assert "mock/tasker-local" in models.json()["models"]
+
     response = api.post("/api/ai/generate-tasks", json={"goal": "Запустить MVP"})
     assert response.status_code == 200
     assert response.json()["status"] == "pending"
+    assert response.json()["mock"] is True
 
     history = api.get("/api/ai/suggestions")
     assert history.status_code == 200
     assert len(history.json()) >= 1
+
+
+def test_ai_mock_endpoints_validate_input_without_api_key(api: TestClient, monkeypatch) -> None:
+    monkeypatch.setenv("AI_MOCK_MODE", "true")
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+
+    generate = api.post("/api/ai/generate-tasks", json={"goal": ""})
+    split = api.post("/api/ai/split-task", json={"text": ""})
+    improve = api.post("/api/ai/improve-task", json={"title": "", "description": "test"})
+
+    assert generate.status_code == 422
+    assert generate.json()["code"] == "validation_error"
+    assert split.status_code == 422
+    assert split.json()["code"] == "validation_error"
+    assert improve.status_code == 422
+    assert improve.json()["code"] == "validation_error"
 
 
 def test_rejects_non_ascii_openrouter_key(api: TestClient, monkeypatch) -> None:
