@@ -13,6 +13,40 @@
 Copy-Item .env.example .env
 ```
 
+Заполните `.env` без реальных секретов в репозитории. Для локального Docker-запуска можно оставить значения из примера: frontend будет проксировать `/api` и `/health` во внутренний сервис `backend`, а SQLite будет храниться в named volume.
+
+## Docker Compose
+
+Сборка образов:
+
+```powershell
+docker compose build
+```
+
+Запуск:
+
+```powershell
+docker compose up
+```
+
+Остановка:
+
+```powershell
+docker compose down
+```
+
+После запуска:
+
+- frontend: `http://localhost:5173`
+- backend health: `http://localhost:8000/health`
+
+Переменные в `.env`:
+
+- `BACKEND_PORT` и `FRONTEND_PORT` управляют портами на хосте.
+- `DATABASE_URL` по умолчанию указывает на `sqlite:////data/tasker.sqlite3` внутри контейнера backend.
+- `VITE_API_BASE_URL` для Docker оставляйте пустым, чтобы frontend использовал nginx proxy до backend внутри сети Docker.
+- `OPENROUTER_API_KEY` оставляйте пустым, если используете `AI_MOCK_MODE=true`.
+
 ## Запуск backend
 
 ```powershell
@@ -66,7 +100,3 @@ cd frontend
 npm test
 npm run build
 ```
-
-## Следующий этап
-
-Следующий этап по плану: усилить интеграцию тегов и пользовательских статусов во frontend и расширить покрытие тестами AI UI.

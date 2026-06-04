@@ -1,12 +1,31 @@
+import os
 from collections.abc import Generator
+from pathlib import Path
 
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 
-DATABASE_URL = "sqlite:///./tasker.sqlite3"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./tasker.sqlite3")
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
+def ensure_sqlite_directory(database_url: str) -> None:
+    if not database_url.startswith("sqlite:///"):
+        return
+
+    sqlite_path = database_url.removeprefix("sqlite:///")
+    if sqlite_path == ":memory:":
+        return
+
+    Path(sqlite_path).expanduser().resolve().parent.mkdir(parents=True, exist_ok=True)
+
+
+ensure_sqlite_directory(DATABASE_URL)
+
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
+)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 

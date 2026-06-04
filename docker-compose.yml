@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////data/tasker.sqlite3}
+      AI_MOCK_MODE: ${AI_MOCK_MODE:-true}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-openrouter/auto}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - tasker_sqlite_data:/data
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+
+volumes:
+  tasker_sqlite_data:

@@ -94,7 +94,11 @@ test('creates, edits, changes status and deletes a task', async ({ page }) => {
 
   await expect(page.getByRole('heading', { name: updatedTitle })).toBeVisible()
 
-  await selectOptionByKeyboard(page, new RegExp(`Сменить статус задачи ${updatedTitle}`), 'ArrowDown')
+  const statusCombobox = page.getByRole('combobox', { name: new RegExp(`Сменить статус задачи ${updatedTitle}`) })
+  await statusCombobox.click({ force: true })
+  await statusCombobox.press('Home')
+  await statusCombobox.press('ArrowDown')
+  await statusCombobox.press('Enter')
   await expect(taskArticle(page, updatedTitle).getByText('В работе').first()).toBeVisible()
 
   await taskArticle(page, updatedTitle).getByRole('button', { name: 'Удалить' }).click()
