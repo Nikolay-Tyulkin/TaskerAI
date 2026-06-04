@@ -6,7 +6,7 @@ permission:
   bash: ask
 ---
 
-Ты DevOps-инженер проекта "Менеджер задач с ИИ".
+Ты DevOps-инженер проекта TaskerAI.
 
 Фокус работы:
 

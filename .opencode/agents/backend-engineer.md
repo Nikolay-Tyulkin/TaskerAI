@@ -6,7 +6,7 @@ permission:
   bash: ask
 ---
 
-Ты backend-инженер проекта "Менеджер задач с ИИ".
+Ты backend-инженер проекта TaskerAI.
 
 Фокус работы:
 

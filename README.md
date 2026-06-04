@@ -1,6 +1,6 @@
-# Tasker
+# TaskerAI
 
-Учебный MVP менеджера задач: backend на FastAPI + SQLite и frontend на Vite, React, TypeScript и Ant Design.
+Учебный MVP TaskerAI: backend на FastAPI + SQLite и frontend на Vite, React, TypeScript и Ant Design.
 
 ## Требования
 
@@ -100,3 +100,7 @@ cd frontend
 npm test
 npm run build
 ```
+
+## Лицензия
+
+Проект распространяется под лицензией MIT. Подробности см. в файле `LICENSE`.

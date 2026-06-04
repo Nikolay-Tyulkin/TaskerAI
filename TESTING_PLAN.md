@@ -1,6 +1,6 @@
 # Testing Plan
 
-План тестирования для текущего учебного MVP Tasker: FastAPI backend, SQLite, React/Vite frontend, Vitest/Testing Library и Playwright.
+План тестирования для текущего учебного MVP TaskerAI: FastAPI backend, SQLite, React/Vite frontend, Vitest/Testing Library и Playwright.
 
 ## Цели
 
@@ -119,7 +119,7 @@
 Уже покрыто:
 
 - Открытие приложения в Chromium.
-- Проверка title `Tasker`.
+- Проверка title `TaskerAI`.
 - Проверка видимости заголовка `Задачи`.
 
 Минимальный E2E-набор для MVP:

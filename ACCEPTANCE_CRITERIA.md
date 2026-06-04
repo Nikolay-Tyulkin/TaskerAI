@@ -1,6 +1,6 @@
 # ACCEPTANCE_CRITERIA.md
 
-# Критерии приемки MVP: "Менеджер задач с ИИ"
+# Критерии приемки MVP: TaskerAI
 
 ## 1. Definition of Done для MVP
 
