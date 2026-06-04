@@ -1,6 +1,7 @@
 # TaskerAI
 
-Учебный MVP TaskerAI: backend на FastAPI + SQLite и frontend на Vite, React, TypeScript и Ant Design.
+Учебный MVP TaskerAI: backend на FastAPI + SQLite и frontend на Vite, React, TypeScript и Ant Design.  
+Приложение разработано как референс в рамках курса https://github.com/Nikolay-Tyulkin/ai_development_workshop_e2e
 
 ## Требования
 
