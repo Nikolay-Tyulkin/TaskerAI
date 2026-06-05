@@ -4,6 +4,19 @@ All notable changes to TaskerAI are documented in this file.
 
 The project follows Semantic Versioning.
 
+## [Unreleased]
+
+### Added
+
+- Kanban board view for existing Task items with list/board switching and status updates from board cards.
+- Backend venv helper scripts for tests and Playwright backend startup.
+- E2E coverage for kanban board on desktop and mobile viewport.
+
+### Changed
+
+- Playwright now starts backend through `backend/.venv` instead of relying on the default system `python`.
+- Frontend production build splits React and Ant Design chunks and no longer emits the previous large main chunk warning.
+
 ## [0.1.0] - 2026-06-05
 
 ### Added
@@ -22,8 +35,4 @@ The project follows Semantic Versioning.
 
 ### Known Issues
 
-- `npm run test:e2e` depends on `python -m uvicorn` from `frontend/playwright.config.ts`; on this machine the default `python` points to an environment without `uvicorn`, so E2E requires a Python PATH/environment where backend dependencies are installed or prestarted servers.
-- Docker CLI and Compose are installed, but Docker daemon was not running during release checks, so Docker build and Docker runtime smoke were not verified.
-- Frontend production build emits a Vite warning because the main JavaScript chunk is larger than 500 kB after minification.
-- Vitest logs Ant Design `Modal.destroyOnClose` deprecation warnings and a jsdom `window.getComputedStyle(elt, pseudoElt)` not-implemented warning, while tests still pass.
 - E2E coverage is still limited to smoke and core task flows; several AI, dictionary, subtask, and error scenarios remain documented as future coverage in `TESTING_PLAN.md`.

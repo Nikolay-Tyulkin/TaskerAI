@@ -6,6 +6,7 @@ import { createStatus, deleteStatus, fetchStatuses, updateStatus, type StatusIte
 import { createTag, deleteTag, fetchTags, updateTag, type TagItem } from '../api/tags'
 import { TaskFiltersView } from '../components/TaskFilters'
 import { TaskForm } from '../components/TaskForm'
+import { TaskBoard } from '../components/TaskBoard'
 import { TaskList } from '../components/TaskList'
 import type { AiSettings, AiSuggestionHistoryItem, AiSuggestedTask, ImproveTaskResponse } from '../types/ai'
 import type { Task, TaskFilters, TaskPayload } from '../types/task'
@@ -30,6 +31,7 @@ export function TasksPage() {
   const [tags, setTags] = useState<TagItem[]>([])
   const [statusCounts, setStatusCounts] = useState<Record<string, number>>({})
   const [filters, setFilters] = useState<TaskFilters>({})
+  const [tasksView, setTasksView] = useState<'list' | 'board'>('list')
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [taskModalOpen, setTaskModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -432,19 +434,38 @@ export function TasksPage() {
             ) : null}
             <div className="tasks-stack">
               <TaskFiltersView filters={filters} loading={loading} statuses={statuses} tags={tags} onApply={applyFilters} onReset={resetFilters} />
-              <TaskList
-                tasks={tasks}
-                loading={loading}
-                hasFilters={hasActiveFilters(filters)}
-                statuses={statuses}
-                statusCounts={statusCounts}
-                onEdit={openEditModal}
-                onDelete={(taskId, deleteStrategy) => void handleDelete(taskId, deleteStrategy)}
-                onImproveWithAi={(task) => void openImproveModal(task)}
-                onSplitWithAi={(task) => void openSplitModal(task)}
-                onStatusChange={(task, status) => void handleStatusChange(task, status)}
-                onResetFilters={resetFilters}
-              />
+              <div className="view-toggle" aria-label="Переключение представления задач">
+                <button aria-pressed={tasksView === 'list'} onClick={() => setTasksView('list')} type="button">
+                  Список
+                </button>
+                <button aria-pressed={tasksView === 'board'} onClick={() => setTasksView('board')} type="button">
+                  Доска
+                </button>
+              </div>
+              {tasksView === 'list' ? (
+                <TaskList
+                  tasks={tasks}
+                  loading={loading}
+                  hasFilters={hasActiveFilters(filters)}
+                  statuses={statuses}
+                  statusCounts={statusCounts}
+                  onEdit={openEditModal}
+                  onDelete={(taskId, deleteStrategy) => void handleDelete(taskId, deleteStrategy)}
+                  onImproveWithAi={(task) => void openImproveModal(task)}
+                  onSplitWithAi={(task) => void openSplitModal(task)}
+                  onStatusChange={(task, status) => void handleStatusChange(task, status)}
+                  onResetFilters={resetFilters}
+                />
+              ) : (
+                <TaskBoard
+                  tasks={tasks}
+                  loading={loading}
+                  hasFilters={hasActiveFilters(filters)}
+                  statuses={statuses}
+                  onStatusChange={(task, status) => void handleStatusChange(task, status)}
+                  onResetFilters={resetFilters}
+                />
+              )}
             </div>
           </>
         ) : activePage === 'settings' ? (
@@ -531,7 +552,7 @@ export function TasksPage() {
           </div>
         )}
         <Modal
-          destroyOnClose
+          destroyOnHidden
           footer={null}
           onCancel={closeTaskModal}
           open={taskModalOpen}

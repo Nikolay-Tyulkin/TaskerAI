@@ -26,6 +26,12 @@ async function createTask(request: APIRequestContext, payload: Record<string, un
   return response.json() as Promise<TaskItem>
 }
 
+async function createSubtask(request: APIRequestContext, taskId: number, payload: Record<string, unknown>) {
+  const response = await request.post(`${API_URL}/api/tasks/${taskId}/subtasks`, { data: payload })
+  expect(response.status()).toBe(201)
+  return response.json() as Promise<TaskItem>
+}
+
 function taskArticle(page: Page, title: string) {
   return page.locator('article').filter({ has: page.getByRole('heading', { name: title }) })
 }
@@ -151,6 +157,39 @@ test('searches tasks by title', async ({ page, request }) => {
   await expect(page.getByRole('heading', { name: target })).toBeVisible()
   await expect(page.getByRole('heading', { name: other })).toHaveCount(0)
 })
+
+for (const viewport of [
+  { name: 'desktop', width: 1280, height: 900 },
+  { name: 'mobile', width: 390, height: 844 },
+]) {
+  test(`shows kanban board and updates status on ${viewport.name}`, async ({ page, request }) => {
+    const title = `${E2E_PREFIX} kanban ${viewport.name} ${Date.now()}`
+    const subtaskTitle = `${title} subtask`
+    await page.setViewportSize({ width: viewport.width, height: viewport.height })
+    const task = await createTask(request, { title, status: 'К выполнению', priority: 'Средний' })
+    await createSubtask(request, task.id, { title: subtaskTitle, status: 'Выполнено' })
+
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Доска' }).click()
+
+    await expect(page.getByText('Канбан-доска')).toBeVisible()
+    await expect(page.getByRole('region', { name: 'Колонка К выполнению' })).toContainText(title)
+    await expect(page.getByRole('region', { name: 'Колонка Выполнено' })).not.toContainText(subtaskTitle)
+    await expect(page.getByLabel(`Подзадачи выполнены 1 из 1`)).toBeVisible()
+
+    await taskArticle(page, title).getByRole('button', { name: 'Открыть' }).click()
+    await expect(page.getByRole('dialog')).toContainText(subtaskTitle)
+    await page.getByRole('button', { name: 'Close' }).click()
+
+    await page.getByRole('button', { name: `Перевести задачу ${title} в В работе` }).click()
+
+    await expect(page.getByRole('region', { name: 'Колонка В работе' })).toContainText(title)
+
+    await page.getByRole('button', { name: 'Список' }).click()
+
+    await expect(taskArticle(page, title).getByText('В работе').first()).toBeVisible()
+  })
+}
 
 test('shows backend error state', async ({ page }) => {
   await page.addInitScript(() => {
