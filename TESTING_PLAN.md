@@ -20,6 +20,7 @@
 - Ошибка загрузки backend: отображается сообщение ошибки пользователю.
 - Отображение подзадачи: описание, приоритет, дедлайн, действие открытия и выбор стратегии удаления.
 - Переход на страницу настроек: отображаются блоки статусов и тегов.
+- Канбан-доска: переключение со списка, группировка задач по статусам, смена статуса той же Task, возврат в список.
 
 Что поддерживать в этих тестах:
 
@@ -132,6 +133,7 @@
 - AI mock-flow: открыть AI-генерацию, получить предложения, применить выбранные задачи, проверить историю.
 - AI task actions: разбить задачу на подзадачи, применить выбранные; улучшить формулировку задачи, применить результат.
 - Error state: backend/API возвращает ошибку, frontend показывает понятное сообщение и кнопку повторной попытки там, где она есть.
+- Kanban board: открыть доску, проверить колонки, сменить статус карточки, вернуться в список и увидеть обновленный статус; сценарий проверяется на desktop и mobile viewport.
 
 Требования к будущим E2E:
 
@@ -157,7 +159,7 @@ Backend API tests:
 
 ```powershell
 cd backend
-python -m pytest
+.\scripts\run-tests.cmd
 ```
 
 Frontend unit/component tests:
@@ -181,6 +183,8 @@ cd frontend
 npm run test:e2e
 ```
 
+E2E webServer поднимает backend через `backend\scripts\run-e2e-backend.cmd`, поэтому backend-зависимости устанавливаются в `backend/.venv` автоматически при первом запуске.
+
 Установка Playwright browsers после первого `npm install` или после обновления Playwright:
 
 ```powershell
@@ -192,7 +196,7 @@ Smoke-запуск backend вручную:
 
 ```powershell
 cd backend
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+.\scripts\run-e2e-backend.cmd
 Invoke-RestMethod http://127.0.0.1:8000/health
 ```
 
@@ -219,7 +223,7 @@ npm run dev
 
 Перед завершением задачи или этапа разработки запускать минимум:
 
-- `python -m pytest` в `backend`.
+- `.\scripts\run-tests.cmd` в `backend`, чтобы создать `.venv` при необходимости, установить зависимости и запустить pytest через venv.
 - `npm test` в `frontend`.
 - `npm run build` в `frontend`.
 - `npm run test:e2e` в `frontend`, если изменения затрагивают пользовательский сценарий или frontend shell.

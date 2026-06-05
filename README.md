@@ -52,11 +52,19 @@ docker compose down
 
 ```powershell
 cd backend
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -e .
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+if (-not (Test-Path .\.venv\Scripts\python.exe)) { py -3 -m venv .venv }
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Backend всегда запускается через `backend/.venv`, чтобы не зависеть от случайного системного `python` в `PATH`. Если `.venv` отсутствует, команда создает его и устанавливает зависимости из `backend/pyproject.toml`.
+
+Для автоматической подготовки `.venv` и запуска backend в E2E используется:
+
+```powershell
+cd backend
+.\scripts\run-e2e-backend.cmd
 ```
 
 Проверка:
@@ -78,6 +86,7 @@ npm run dev
 ## Что реализовано
 
 - CRUD задач, фильтры по статусу/приоритету/дедлайну/тегу/поиску, сортировка и счетчики по статусам.
+- Канбан-доска как альтернативное представление тех же задач с переключением между списком и доской.
 - Подзадачи одного уровня и удаление родительской задачи со стратегиями `cascade`/`unlink`.
 - Справочники статусов и тегов, назначение тегов задачам.
 - AI endpoint-ы для генерации задач, разбиения задачи и улучшения формулировки с apply/cancel статусами истории.
@@ -89,7 +98,7 @@ Backend:
 
 ```powershell
 cd backend
-python -m pytest
+.\scripts\run-tests.cmd
 ```
 
 Backend-тесты покрывают API задач и AI mock-flow. Реальный AI API key для запуска тестов не требуется.
@@ -101,6 +110,15 @@ cd frontend
 npm test
 npm run build
 ```
+
+E2E:
+
+```powershell
+cd frontend
+npm run test:e2e
+```
+
+Playwright автоматически поднимает backend через `backend\scripts\run-e2e-backend.cmd`, который использует `backend/.venv` и создает его при отсутствии.
 
 ## Лицензия
 
