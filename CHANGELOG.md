@@ -1,38 +1,54 @@
-# Changelog
+# Журнал изменений
 
-All notable changes to TaskerAI are documented in this file.
+В этом файле фиксируются значимые изменения TaskerAI.
 
-The project follows Semantic Versioning.
+Проект следует Semantic Versioning.
 
-## [Unreleased]
+## [0.2.0] - 2026-06-05
 
-### Added
+### Добавлено
 
-- Kanban board view for existing Task items with list/board switching and status updates from board cards.
-- Backend venv helper scripts for tests and Playwright backend startup.
-- E2E coverage for kanban board on desktop and mobile viewport.
+- Канбан-доска как альтернативное представление существующих задач `Task`.
+- Переключение между списком задач и канбан-доской на экране задач.
+- Распределение родительских задач по колонкам существующих статусов.
+- Смена статуса задачи из карточки на канбан-доске без создания отдельной сущности `KanbanTask`.
+- Прогресс подзадач на карточке родительской задачи в формате `выполнено/всего`.
+- Модальное окно родительской задачи со списком подзадач при открытии карточки на доске.
+- Артефакты фичи в `features/001-2026-06-05-kanban-board/`.
+- Скрипты `backend/scripts/run-tests.cmd` и `backend/scripts/run-e2e-backend.cmd` для запуска backend-проверок через `backend/.venv`.
+- E2E-покрытие канбан-доски для desktop и mobile viewport.
 
-### Changed
+### Изменено
 
-- Playwright now starts backend through `backend/.venv` instead of relying on the default system `python`.
-- Frontend production build splits React and Ant Design chunks and no longer emits the previous large main chunk warning.
+- Playwright поднимает backend через `backend/.venv`, а не через случайный системный `python` из `PATH`.
+- Инструкции в `README.md` и `TESTING_PLAN.md` обновлены под автоматическое создание `backend/.venv` при необходимости.
+- Frontend production build разделяет React и Ant Design chunks и не выводит прежнее предупреждение о большом основном JS chunk.
+- Vitest setup обновлен для стабильной работы Ant Design компонентов в jsdom.
+
+### Проверено
+
+- Backend tests через `backend/scripts/run-tests.cmd`.
+- Frontend unit/component tests через `npm test -- --run`.
+- Frontend production build через `npm run build`.
+- Playwright E2E через `npm run test:e2e`.
+- Docker Compose config, build и runtime smoke.
 
 ## [0.1.0] - 2026-06-05
 
-### Added
+### Добавлено
 
-- MVP backend on FastAPI with SQLite persistence.
-- Task CRUD API with validation, filtering, sorting, status counters, one-level subtasks, and delete strategies for parent tasks.
-- Status and tag dictionaries with task assignment support.
-- AI endpoints for task generation, task splitting, task text improvement, AI settings, and AI suggestion history.
-- Mock AI mode for local development and automated tests without a real OpenRouter API key.
-- Frontend on Vite, React, TypeScript, and Ant Design.
-- Task UI with create/edit/delete flows, filters, counters, subtasks, dictionaries, AI actions, and AI history.
-- Backend pytest coverage for task, status, tag, and AI flows.
-- Frontend Vitest component tests and Playwright E2E smoke/task-flow tests.
-- Dockerfiles and Docker Compose configuration for backend, frontend, and SQLite volume.
-- Project documentation: README, project spec, implementation plan, testing plan, agents, skills, and tool notes.
+- MVP backend на FastAPI с хранением данных в SQLite.
+- Task CRUD API с валидацией, фильтрацией, сортировкой, счетчиками по статусам, подзадачами одного уровня и стратегиями удаления родительских задач.
+- Справочники статусов и тегов с поддержкой назначения тегов задачам.
+- AI endpoint-ы для генерации задач, разбиения задачи, улучшения формулировки, AI-настроек и истории AI-предложений.
+- Mock AI mode для локальной разработки и автоматических тестов без реального OpenRouter API key.
+- Frontend на Vite, React, TypeScript и Ant Design.
+- UI задач с созданием, редактированием, удалением, фильтрами, счетчиками, подзадачами, справочниками, AI-действиями и историей AI.
+- Backend pytest coverage для задач, статусов, тегов и AI-flow.
+- Frontend Vitest component tests и Playwright E2E smoke/task-flow tests.
+- Dockerfiles и Docker Compose конфигурация для backend, frontend и SQLite volume.
+- Документация проекта: README, спецификация проекта, план реализации, план тестирования, agents, skills и tool notes.
 
-### Known Issues
+### Известные ограничения
 
-- E2E coverage is still limited to smoke and core task flows; several AI, dictionary, subtask, and error scenarios remain documented as future coverage in `TESTING_PLAN.md`.
+- E2E-покрытие остается сфокусированным на smoke и ключевых сценариях задач; дополнительные AI, dictionary, subtask и error-сценарии описаны как будущие проверки в `TESTING_PLAN.md`.
